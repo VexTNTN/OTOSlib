@@ -7,26 +7,24 @@
 
 OTOS otos(1);
 
-void initialize()
-{
+void initialize() {
   otos.calibrate();
-  otos.setOffset({2.75, -7.5, 0});
+  otos.setOffset({2.75, -7.5, 180});
   otos.setAngularScaler(0.923076923);
   otos.setLinearScaler(0.988739357);
   otos.resetTracking();
-  otos.setPose({0, 0, 0});
+  otos.setPose({0, 0, });
 }
 
-void opcontrol()
-{
+void opcontrol() {
   pros::Controller master(pros::E_CONTROLLER_MASTER);
 
-  while (true)
-  {
+  while (true) {
     auto pose = otos.getPose();
+    if (otos.isCalibrated and !(pose.x == 0 && pose.y == 0 && pose.theta == 0) ) {
+      printf("x:%f y:%f theta:%f \n", pose.x, pose.y, pose.theta);
+    }
 
-    printf("x:%f y:%f theta:%f \n", pose.x, pose.y, pose.theta);
-
-    pros::delay(10);
+    pros::delay(100);
   }
 }

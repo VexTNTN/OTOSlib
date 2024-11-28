@@ -1,4 +1,5 @@
 #include "main.h"
+#include "pros/rtos.hpp"
 #include "OTOS.hpp"
 
 void OTOS::sendCommand(char command, void *data, int length)
@@ -27,9 +28,9 @@ void OTOS::sendCommand(char command, void *data, int length)
     // printf("\n");
 }
 
-OTOS::OTOS(int port)
+OTOS::OTOS(int port) : port(port)
 {
-    this->serial = new pros::Serial(port, 921600);
+
 }
 
 OTOS::~OTOS()
@@ -38,6 +39,8 @@ OTOS::~OTOS()
 }
 void OTOS::calibrate()
 {
+    this->serial = new pros::Serial(port, 921600);
+    pros::delay(20);
     this->sendCommand('C', nullptr, 0);
 }
 
@@ -64,7 +67,7 @@ Pose OTOS::getPose()
     }
     if (crc != (buffer[13] + (buffer[14] << 8)))
     {
-        std::cout << "recv error: " << recv << std::endl;
+        //std::cout << "recv error: " << recv << std::endl;
         // for (int i = 0; i < recv; ++i)
         // {
         //     std::cout << "0x" << std::hex << (int)buffer[i] << " ";
@@ -75,6 +78,7 @@ Pose OTOS::getPose()
 
     Pose pose;
     std::memcpy(&pose, &buffer[1], 12);
+    isCalibrated = true;
     lastRead = pose;
     return pose;
 }
